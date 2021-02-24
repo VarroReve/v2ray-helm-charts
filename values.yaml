@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: v2fly/v2fly-core
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -16,7 +16,7 @@ fullnameOverride: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -77,3 +77,105 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+volumes:
+  - configMap:
+      defaultMode: 420
+      items:
+        - key: config.json
+          path: config.json
+      name: v2ray
+    name: v2ray-conf
+
+configmap: |-
+  {
+    "log": {
+      "loglevel": "warning"
+    },
+    "inbounds": [
+      {
+        "port": 1080,
+        "listen": "127.0.0.1",
+        "tag": "socks-inbound",
+        "protocol": "socks",
+        "settings": {
+          "auth": "noauth",
+          "udp": false,
+          "ip": "127.0.0.1"
+        },
+        "sniffing": {
+          "enabled": true,
+          "destOverride": [
+              "http",
+              "tls"
+          ]
+        }
+      }
+    ],
+    "outbounds": [
+      {
+        "protocol": "freedom",
+        "settings": {},
+        "tag": "direct"
+      },
+      {
+        "protocol": "blackhole",
+        "settings": {},
+        "tag": "blocked"
+      }
+    ],
+    "routing": {
+      "domainStrategy": "IPOnDemand",
+      "rules": [
+        {
+          "type": "field",
+          "ip": [
+              "geoip:private"
+          ],
+          "outboundTag": "blocked"
+        },
+        {
+          "type": "field",
+          "domain": [
+              "geosite:category-ads"
+          ],
+          "outboundTag": "blocked"
+        }
+      ]
+    },
+    "dns": {
+      "hosts": {
+        "domain:v2ray.com": "www.vicemc.net",
+        "domain:github.io": "pages.github.com",
+        "domain:wikipedia.org": "www.wikimedia.org",
+        "domain:shadowsocks.org": "electronicsrealm.com"
+      },
+      "servers": [
+        "1.1.1.1",
+        {
+          "address": "114.114.114.114",
+          "port": 53,
+          "domains": [
+              "geosite:cn"
+          ]
+        },
+        "8.8.8.8",
+        "localhost"
+      ]
+    },
+    "policy": {
+      "levels": {
+        "0": {
+          "uplinkOnly": 0,
+          "downlinkOnly": 0
+        }
+      },
+      "system": {
+        "statsInboundUplink": false,
+        "statsInboundDownlink": false,
+        "statsOutboundUplink": false,
+        "statsOutboundDownlink": false
+      }
+    },
+    "other": {}
+  }

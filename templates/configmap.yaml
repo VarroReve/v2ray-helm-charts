@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "v2ray.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app: {{ template "v2ray.name" . }}
+    chart: {{ template "v2ray.chart" . }}
+    heritage: {{ .Release.Service }}
+    release: {{ .Release.Name }}
+data:
+  config.json: |-
+{{- if .Values.configmap }}
+{{- tpl .Values.configmap . | nindent 4 }}
+{{- end }}
