@@ -47,7 +47,12 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /etc/v2ray/
-              name: v2ray-conf
+              name: v2ray-config
+          {{- if .Values.tls.enabled }}
+            - mountPath: /etc/v2ray/tls
+              name: v2ray-tls
+              readOnly: true
+          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -60,7 +65,22 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.volumes }}
       volumes:
-        {{- toYaml . | nindent 8 }}
+        - name: v2ray-config
+          configMap:
+              name: v2ray-config
+              defaultMode: 420
+              items:
+                - key: config.json
+                  path: config.json
+      {{- if .Values.tls.enabled }}
+        - name: v2ray-tls
+          secret:
+            defaultMode: 420
+            secretName: {{ .Values.tls.certificatesSecret }}
+            items:
+              - key: tls.crt
+                path: {{ .Values.tls.certFilename }}
+              - key: tls.key
+                path: {{ .Values.tls.certKeyFilename }}
       {{- end }}

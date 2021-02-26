@@ -80,104 +80,33 @@ tolerations: []
 
 affinity: {}
 
-volumes:
-  - configMap:
-      defaultMode: 420
-      items:
-        - key: config.json
-          path: config.json
-      name: v2ray
-    name: v2ray-conf
+##
+## TLS configuration
+##
+tls:
+  # Enable TLS traffic
+  enabled: false
+  #
+  # Name of the Secret that contains the certificates
+  certificatesSecret: v2ray-tls
+  #
+  # Certificate filename
+  certFilename: v2ray.pem
+  #
+  # Certificate Key filename
+  certKeyFilename: v2ray.key
 
 configmap: |-
   {
-    "log": {
-      "loglevel": "warning"
-    },
-    "inbounds": [
-      {
-        "port": 1080,
-        "listen": "127.0.0.1",
-        "tag": "socks-inbound",
-        "protocol": "socks",
-        "settings": {
-          "auth": "noauth",
-          "udp": false,
-          "ip": "127.0.0.1"
-        },
-        "sniffing": {
-          "enabled": true,
-          "destOverride": [
-              "http",
-              "tls"
-          ]
-        }
-      }
-    ],
-    "outbounds": [
-      {
-        "protocol": "freedom",
-        "settings": {},
-        "tag": "direct"
-      },
-      {
-        "protocol": "blackhole",
-        "settings": {},
-        "tag": "blocked"
-      }
-    ],
-    "routing": {
-      "domainStrategy": "IPOnDemand",
-      "rules": [
-        {
-          "type": "field",
-          "ip": [
-              "geoip:private"
-          ],
-          "outboundTag": "blocked"
-        },
-        {
-          "type": "field",
-          "domain": [
-              "geosite:category-ads"
-          ],
-          "outboundTag": "blocked"
-        }
-      ]
-    },
-    "dns": {
-      "hosts": {
-        "domain:v2ray.com": "www.vicemc.net",
-        "domain:github.io": "pages.github.com",
-        "domain:wikipedia.org": "www.wikimedia.org",
-        "domain:shadowsocks.org": "electronicsrealm.com"
-      },
-      "servers": [
-        "1.1.1.1",
-        {
-          "address": "114.114.114.114",
-          "port": 53,
-          "domains": [
-              "geosite:cn"
-          ]
-        },
-        "8.8.8.8",
-        "localhost"
-      ]
-    },
-    "policy": {
-      "levels": {
-        "0": {
-          "uplinkOnly": 0,
-          "downlinkOnly": 0
-        }
-      },
-      "system": {
-        "statsInboundUplink": false,
-        "statsInboundDownlink": false,
-        "statsOutboundUplink": false,
-        "statsOutboundDownlink": false
-      }
-    },
-    "other": {}
+    "log": {},
+    "api": {},
+    "dns": {},
+    "routing": {},
+    "policy": {},
+    "inbounds": [],
+    "outbounds": [],
+    "transport": {},
+    "stats": {},
+    "reverse": {},
+    "fakedns": {}
   }

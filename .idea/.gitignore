@@ -1,9 +1,0 @@
-# Default ignored files
-.idea/
-/shelf/
-/workspace.xml
-# Datasource local storage ignored files
-/../../../../../../:\Users\admin\code\v2ray-helm-charts\.idea/dataSources/
-/dataSources.local.xml
-# Editor-based HTTP Client requests
-/httpRequests/

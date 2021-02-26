@@ -6,7 +6,7 @@ description: A Helm charts for deploying V2Ray to Kubernetes.
 
 type: application
 
-version: 1.0.0
+version: 1.0.1
 
 appVersion: V4.34.0
 
